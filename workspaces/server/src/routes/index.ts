@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { compress } from 'hono/compress';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { secureHeaders } from 'hono/secure-headers';
@@ -14,15 +13,6 @@ import { ssrApp } from './ssr';
 import { staticApp } from './static';
 
 const app = new Hono();
-
-app.use(async (c, next) => {
-  const contentType = c.req.header('Content-Type');
-  if (contentType && contentType.includes('text')) {
-    await compress()(c, next);
-  } else {
-    await next();
-  }
-});
 
 app.use(secureHeaders());
 app.use(
