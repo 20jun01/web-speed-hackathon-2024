@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 
 import { Hono } from 'hono';
+import { compress } from 'hono/compress';
 import { HTTPException } from 'hono/http-exception';
 import jsesc from 'jsesc';
 import moment from 'moment-timezone';
@@ -18,6 +19,15 @@ import { getDayOfWeekStr } from '@wsh-2024/app/src/lib/date/getDayOfWeekStr';
 import { INDEX_HTML_PATH } from '../../constants/paths';
 
 const app = new Hono();
+
+app.use(async (c, next) => {
+  const contentType = c.req.header('Content-Type');
+  if (contentType && contentType.includes('text')) {
+    await compress()(c, next);
+  } else {
+    await next();
+  }
+});
 
 async function createInjectDataStr(): Promise<Record<string, unknown>> {
   const json: Record<string, unknown> = {};
